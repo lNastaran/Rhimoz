@@ -11,6 +11,8 @@ dependencies = [
     "verovio==4.4.0",
     "svglib==1.5.1",
     "reportlab==4.2.5",
+    "fonttools==4.63.0",
+    "brotli==1.2.0",
     "setuptools<81",
 ]
 

@@ -5,6 +5,7 @@ import type { TranscribeResponse } from './api/types';
 import { UploadForm } from './components/UploadForm';
 import { NotationViewer } from './components/NotationViewer';
 import { AudioPlayer } from './components/AudioPlayer';
+import { DownloadButtons } from './components/DownloadButtons';
 import { useCursorSync } from './hooks/useCursorSync';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <>
           <NotationViewer musicxml={response.musicxml} osmdRef={osmdRef} />
           <AudioPlayer src={audioUrl} audioRef={audioRef} />
+          <DownloadButtons downloadUrls={response.download_urls} />
         </>
       )}
     </main>

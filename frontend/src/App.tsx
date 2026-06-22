@@ -5,6 +5,7 @@ import type { TranscribeResponse } from './api/types';
 import { UploadForm } from './components/UploadForm';
 import { NotationViewer } from './components/NotationViewer';
 import { AudioPlayer } from './components/AudioPlayer';
+import { useCursorSync } from './hooks/useCursorSync';
 
 function App() {
   const [response, setResponse] = useState<TranscribeResponse | null>(null);
@@ -27,6 +28,8 @@ function App() {
       if (audioUrl) URL.revokeObjectURL(audioUrl);
     };
   }, [audioUrl]);
+
+  useCursorSync({ audioRef, osmdRef, tempoBpm: response?.tempo_bpm ?? null });
 
   return (
     <main>

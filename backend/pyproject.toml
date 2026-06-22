@@ -1,0 +1,29 @@
+[project]
+name = "rhimoz-api"
+version = "0.1.0"
+description = "FastAPI service wrapping the Rhimoz transcription engine"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn[standard]==0.32.1",
+    "python-multipart==0.0.20",
+    "rhimoz",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.4", "httpx==0.28.1"]
+
+[tool.uv.sources]
+rhimoz = { path = "../engine", editable = true }
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: loads Basic Pitch and needs real audio (deselect with -m \"not integration\")",
+]

@@ -25,3 +25,8 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: loads Basic Pitch and needs real audio (deselect with -m \"not integration\")",
+]

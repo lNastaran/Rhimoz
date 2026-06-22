@@ -1,0 +1,25 @@
+[project]
+name = "rhimoz"
+version = "0.1.0"
+description = "Rhimoz audio-to-sheet-music transcription engine"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "basic-pitch==0.4.0",
+    "coremltools==9.0; sys_platform == 'darwin'",
+    "librosa==0.11.0",
+    "music21==9.7.1",
+    "verovio==4.4.0",
+    "svglib==1.5.1",
+    "reportlab==4.2.5",
+    "setuptools<81",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.4"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

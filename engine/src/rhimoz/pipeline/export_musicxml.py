@@ -31,7 +31,10 @@ def note_sequence_to_stream(seq: NoteSequence) -> music21.stream.Score:
     bpm = seq.tempo_bpm or DEFAULT_BPM
 
     part = music21.stream.Part()
-    part.append(music21.tempo.MetronomeMark(number=bpm))
+    # Display rounded (e.g. "136" rather than "135.99917...") - the
+    # precise bpm is still used for the offset/duration math below, since
+    # rounding there would compound into audible drift over a long piece.
+    part.append(music21.tempo.MetronomeMark(number=round(bpm)))
 
     for note in seq.notes:
         offset = _seconds_to_quarter_length(note.start_s, bpm)

@@ -10,13 +10,16 @@ from pathlib import Path
 import music21
 
 from rhimoz.notes.model import NoteSequence
+from rhimoz.pipeline.quantize import DEFAULT_GRID_DIVISION
 
 DEFAULT_BPM = 120.0
-# Matches quantize.py's default grid_division=4 against a quarter-note
-# beat (tempo_bpm is quarter notes per minute): the finest grid step is a
-# sixteenth note, so rounding to 1/16 here removes float noise from the
-# seconds->quarterLength conversion without losing any real precision.
-GRID_DENOMINATOR = 16
+# Must equal quantize.py's grid_division (imported, not duplicated): a
+# quantized note's start/end always lands on an exact multiple of
+# 1/grid_division quarter notes, so rounding quarterLength to the nearest
+# 1/GRID_DENOMINATOR is only lossless if GRID_DENOMINATOR == grid_division.
+# A mismatch wouldn't crash - it would silently round notes to slightly
+# wrong positions.
+GRID_DENOMINATOR = DEFAULT_GRID_DIVISION
 
 
 def _seconds_to_quarter_length(seconds: float, bpm: float) -> Fraction:

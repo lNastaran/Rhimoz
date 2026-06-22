@@ -19,6 +19,12 @@ from rhimoz.notes.model import NoteSequence, TranscribedNote
 MIN_BPM = 40.0
 MAX_BPM = 240.0
 DEFAULT_FALLBACK_BPM = 120.0
+# Subdivisions per quarter-note beat (4 = sixteenth-note grid). Shared with
+# export_musicxml.py's quarterLength rounding - that rounding denominator
+# must equal this value exactly, or grid steps stop landing on exact
+# fractions and notes silently shift position in the exported file. See
+# export_musicxml.py's import of this constant.
+DEFAULT_GRID_DIVISION = 4
 
 
 @dataclass
@@ -51,7 +57,7 @@ def estimate_tempo(y: np.ndarray, sr: int) -> TempoEstimate:
 
 
 def quantize_to_grid(
-    seq: NoteSequence, tempo: TempoEstimate, grid_division: int = 4
+    seq: NoteSequence, tempo: TempoEstimate, grid_division: int = DEFAULT_GRID_DIVISION
 ) -> NoteSequence:
     """Snap each note's start/end to the nearest 1/grid_division-beat
     position (grid_division=4 against a quarter-note beat means snapping

@@ -7,7 +7,7 @@ interface DownloadButtonsProps {
 
 export function DownloadButtons({ downloadUrls }: DownloadButtonsProps) {
   return (
-    <div>
+    <div style={{ display: 'flex', gap: '1rem' }}>
       <a href={downloadUrl(downloadUrls.pdf)} download>
         Download PDF
       </a>

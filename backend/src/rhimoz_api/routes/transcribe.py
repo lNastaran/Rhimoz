@@ -52,29 +52,38 @@ async def transcribe(
     job_dir = JOBS_ROOT / job_id
     job_dir.mkdir(parents=True)
 
-    upload_path = job_dir / (file.filename or "upload")
-    size = 0
-    with upload_path.open("wb") as out:
-        while chunk := file.file.read(1 << 20):
-            size += len(chunk)
-            if size > MAX_UPLOAD_BYTES:
-                shutil.rmtree(job_dir, ignore_errors=True)
-                raise HTTPException(413, "File too large")
-            out.write(chunk)
-
-    profile = PROFILES[instrument]()
+    # Single try/finally around everything that touches job_dir, not just
+    # the transcribe_file() call: an exception from the write loop itself
+    # (e.g. a disk I/O error mid-upload) used to skip cleanup entirely and
+    # leak the directory forever, since the old code only cleaned up on
+    # the size-cap check and on transcribe_file() failure specifically.
+    succeeded = False
     try:
-        result = transcribe_file(upload_path, profile, job_dir)
-    except Exception as exc:
-        # soundfile/librosa raise on corrupt/unreadable audio. The most
-        # likely cause is a bad upload, not a server bug, so surface this
-        # as a client error rather than a raw 500. No JobRecord gets
-        # created on failure, so the directory isn't reachable through any
-        # API - clean it up now rather than letting it sit unused forever.
-        shutil.rmtree(job_dir, ignore_errors=True)
-        raise HTTPException(422, f"Could not transcribe audio: {exc}") from exc
+        upload_path = job_dir / (file.filename or "upload")
+        size = 0
+        with upload_path.open("wb") as out:
+            while chunk := file.file.read(1 << 20):
+                size += len(chunk)
+                if size > MAX_UPLOAD_BYTES:
+                    raise HTTPException(413, "File too large")
+                out.write(chunk)
 
-    JOBS[job_id] = JobRecord(job_dir=job_dir, result=result)
+        profile = PROFILES[instrument]()
+        try:
+            result = transcribe_file(upload_path, profile, job_dir)
+        except Exception as exc:
+            # soundfile/librosa raise on corrupt/unreadable audio. The
+            # most likely cause is a bad upload, not a server bug, so
+            # surface this as a client error rather than a raw 500.
+            raise HTTPException(422, f"Could not transcribe audio: {exc}") from exc
+
+        JOBS[job_id] = JobRecord(job_dir=job_dir, result=result)
+        succeeded = True
+    finally:
+        # No JobRecord means the directory isn't reachable through any
+        # API - clean it up now rather than letting it sit unused forever.
+        if not succeeded:
+            shutil.rmtree(job_dir, ignore_errors=True)
 
     return TranscribeResponse(
         job_id=job_id,

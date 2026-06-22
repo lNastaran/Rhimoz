@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from rhimoz_api.routes import transcribe
+from rhimoz_api.routes import downloads, transcribe
 
 app = FastAPI(title="Rhimoz API")
 
@@ -15,3 +15,4 @@ app.add_middleware(
 )
 
 app.include_router(transcribe.router)
+app.include_router(downloads.router)

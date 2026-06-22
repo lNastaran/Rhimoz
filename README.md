@@ -8,6 +8,8 @@ A Music transcription: audio in, downloadable sheet music out
 
 ```
 engine/            production package: file in -> MusicXML/MIDI/PDF out
+backend/           FastAPI service wrapping engine/ for the web frontend
+frontend/          React + TypeScript + Vite web UI (upload, notation, playback, downloads)
 research/phase0/   throwaway research that validated the approach above -
                    never imported by engine/, kept for its findings
 assets/            logo and other static brand assets
@@ -17,7 +19,7 @@ assets/            logo and other static brand assets
 
 1. ✅ Core transcription engine (file-based) - preprocessing, pitch
    detection, tempo/beat quantization, MusicXML/MIDI/PDF export
-2. Web frontend: upload UI, notation rendering, playback, downloads
+2. ✅ Web frontend: upload UI, notation rendering, playback, downloads
 3. Harmonica tab overlay (the differentiator): standard notation rendered
    normally, with a second line underneath each note showing the hole
    number and a blow/draw arrow (↑ = blow, ↓ = draw), the format used in
@@ -34,6 +36,7 @@ Explicitly out of scope: fetching arbitrary copyrighted audio by song
 title (a licensing problem, not an engineering one), YouTube ingestion,
 and training a custom pitch-detection model from scratch.
 
-## Engine dev setup
+## Dev setup
 
-See [engine/README.md](engine/README.md).
+See [engine/README.md](engine/README.md), [backend/README.md](backend/README.md),
+and [frontend/README.md](frontend/README.md).

@@ -20,7 +20,7 @@ assets/            logo and other static brand assets
 2. Web frontend: upload UI, notation rendering, playback, downloads
 3. Harmonica tab overlay (the differentiator): standard notation rendered
    normally, with a second line underneath each note showing the hole
-   number and a blow/draw arrow (↑ = blow, ↓ = draw) - the format used in
+   number and a blow/draw arrow (↑ = blow, ↓ = draw), the format used in
    published harmonica tab books. This isn't built yet, but the engine
    already produces exactly the note+timing data it will need, with a
    typed-but-empty slot (`TabAnnotation`) ready to attach it.

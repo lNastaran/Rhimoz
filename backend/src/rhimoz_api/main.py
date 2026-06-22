@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from rhimoz_api.routes import transcribe
+
 app = FastAPI(title="Rhimoz API")
 
 # Vite's dev server runs on a different port than uvicorn, so the browser
@@ -11,3 +13,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(transcribe.router)

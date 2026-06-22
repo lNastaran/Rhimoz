@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest==8.3.4", "httpx==0.28.1"]
+dev = ["pytest==8.3.4", "pytest-asyncio==0.24.0", "httpx==0.28.1"]
 
 [tool.uv.sources]
 rhimoz = { path = "../engine", editable = true }
@@ -24,6 +24,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 markers = [
     "integration: loads Basic Pitch and needs real audio (deselect with -m \"not integration\")",
 ]

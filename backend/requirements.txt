@@ -1,7 +1,4 @@
 # rhimoz (the engine) is a local editable path dependency on ../engine,
-# declared in pyproject.toml's [tool.uv.sources] - not listed here since
-# it has no PyPI version to pin. `uv pip install -e ".[dev]"` installs it
-# automatically; installing only from this file will not.
 annotated-types==0.7.0
 anyio==4.14.0
 attrs==26.1.0
@@ -58,6 +55,7 @@ pydantic==2.13.4
 pydantic-core==2.46.4
 pyparsing==3.3.2
 pytest==8.3.4
+pytest-asyncio==0.24.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.2
 python-multipart==0.0.20

@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import type { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
 import { postTranscribe } from './api/transcribe';
 import type { TranscribeResponse } from './api/types';
 import { UploadForm } from './components/UploadForm';
+import { NotationViewer } from './components/NotationViewer';
 
 function App() {
-  // TODO: replaced by notation/audio/download components in later commits
-  // of this phase - this placeholder exists to verify the upload ->
-  // backend -> response wiring works end to end before building UI on top.
   const [response, setResponse] = useState<TranscribeResponse | null>(null);
+  const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
 
   async function handleUpload(file: File, instrument: string) {
     const result = await postTranscribe(file, instrument);
@@ -18,11 +18,7 @@ function App() {
     <main>
       <h1>Rhimoz</h1>
       <UploadForm onSubmit={handleUpload} />
-      {response && (
-        <p>
-          Transcribed {response.notes.length} notes at {response.tempo_bpm?.toFixed(1)} BPM
-        </p>
-      )}
+      {response && <NotationViewer musicxml={response.musicxml} osmdRef={osmdRef} />}
     </main>
   );
 }

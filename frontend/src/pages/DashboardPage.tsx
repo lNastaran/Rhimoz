@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { deleteSaved, listSaved } from '../api/saved';
 import type { SavedTranscriptionOut } from '../api/types';
@@ -62,7 +62,7 @@ export function DashboardPage() {
         <ul>
           {saved.map((row) => (
             <li key={row.id} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <span>{row.display_name}</span>
+              <Link to={`/saved/${row.id}`}>{row.display_name}</Link>
               <span>({row.instrument_name})</span>
               <button onClick={() => handleDelete(row.id)} disabled={deletingId === row.id}>
                 {deletingId === row.id ? 'Deleting...' : 'Delete'}

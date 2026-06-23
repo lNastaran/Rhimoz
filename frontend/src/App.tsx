@@ -3,6 +3,7 @@ import { TranscribePage } from './pages/TranscribePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { ReopenedTranscriptionPage } from './pages/ReopenedTranscriptionPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/saved/:id" element={<ReopenedTranscriptionPage />} />
       </Routes>
     </main>
   );

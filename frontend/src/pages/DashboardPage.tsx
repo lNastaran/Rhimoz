@@ -63,6 +63,7 @@ export function DashboardPage() {
           {saved.map((row) => (
             <li key={row.id} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <Link to={`/saved/${row.id}`}>{row.display_name}</Link>
+              {row.composer && <span>by {row.composer}</span>}
               <span>({row.instrument_name})</span>
               <button onClick={() => handleDelete(row.id)} disabled={deletingId === row.id}>
                 {deletingId === row.id ? 'Deleting...' : 'Delete'}

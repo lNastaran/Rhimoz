@@ -3,15 +3,30 @@ import type { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { getSaved } from '../api/saved';
-import type { SavedTranscriptionDetailOut } from '../api/types';
+import { getPublic } from '../api/public';
+import type { TranscribedNoteOut } from '../api/types';
 import { NotationViewer } from '../components/NotationViewer';
 import { SavedDownloadButtons } from '../components/SavedDownloadButtons';
 
-export function ReopenedTranscriptionPage() {
+// A reopened transcription, normalized across both sources so the view
+// doesn't branch on display_name vs title below.
+interface ReopenedDetail {
+  id: string;
+  title: string;
+  composer: string | null;
+  musicxml: string;
+  notes: TranscribedNoteOut[];
+}
+
+interface ReopenedTranscriptionPageProps {
+  source: 'saved' | 'public';
+}
+
+export function ReopenedTranscriptionPage({ source }: ReopenedTranscriptionPageProps) {
   const { session, isLoading: isAuthLoading } = useAuth();
   const { id } = useParams<{ id: string }>();
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
-  const [saved, setSaved] = useState<SavedTranscriptionDetailOut | null>(null);
+  const [detail, setDetail] = useState<ReopenedDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const token = session?.access_token;
@@ -19,11 +34,27 @@ export function ReopenedTranscriptionPage() {
   useEffect(() => {
     if (!token || !id) return;
     let cancelled = false;
-    setSaved(null);
+    setDetail(null);
     setError(null);
-    getSaved(token, id)
-      .then((detail) => {
-        if (!cancelled) setSaved(detail);
+    const load =
+      source === 'public'
+        ? getPublic(token, id).then((d) => ({
+            id: d.id,
+            title: d.title,
+            composer: d.composer,
+            musicxml: d.musicxml,
+            notes: d.notes,
+          }))
+        : getSaved(token, id).then((d) => ({
+            id: d.id,
+            title: d.display_name,
+            composer: d.composer,
+            musicxml: d.musicxml,
+            notes: d.notes,
+          }));
+    load
+      .then((normalized) => {
+        if (!cancelled) setDetail(normalized);
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -31,7 +62,7 @@ export function ReopenedTranscriptionPage() {
     return () => {
       cancelled = true;
     };
-  }, [token, id]);
+  }, [token, id, source]);
 
   if (isAuthLoading) return null;
   if (!session) return <Navigate to="/login" replace />;
@@ -40,22 +71,29 @@ export function ReopenedTranscriptionPage() {
   // string here, not string | undefined - avoids a non-null assertion at
   // the SavedDownloadButtons call site below.
   const accessToken = session.access_token;
+  const backTo = source === 'public' ? '/search' : '/dashboard';
 
   return (
     <div>
       <p>
-        <Link to="/dashboard">Back to dashboard</Link>
+        <Link to={backTo}>{source === 'public' ? 'Back to search' : 'Back to dashboard'}</Link>
       </p>
       {error && <p role="alert">{error}</p>}
-      {saved && (
+      {detail && (
         <>
-          <h2>{saved.display_name}</h2>
+          <h2>{detail.title}</h2>
+          {detail.composer && <p>by {detail.composer}</p>}
           {/* No AudioPlayer here, deliberately - original audio isn't
               persisted (see the Phase 5 plan's "File storage fork"
               section), only the notation and fresh regenerated
               downloads are available for a reopened transcription. */}
-          <NotationViewer musicxml={saved.musicxml} notes={saved.notes} osmdRef={osmdRef} />
-          <SavedDownloadButtons token={accessToken} id={saved.id} displayName={saved.display_name} />
+          <NotationViewer musicxml={detail.musicxml} notes={detail.notes} osmdRef={osmdRef} />
+          <SavedDownloadButtons
+            token={accessToken}
+            id={detail.id}
+            displayName={detail.title}
+            source={source}
+          />
         </>
       )}
     </div>

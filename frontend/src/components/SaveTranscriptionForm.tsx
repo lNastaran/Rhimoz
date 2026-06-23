@@ -10,6 +10,7 @@ interface SaveTranscriptionFormProps {
 export function SaveTranscriptionForm({ jobId, defaultName }: SaveTranscriptionFormProps) {
   const { session } = useAuth();
   const [displayName, setDisplayName] = useState(defaultName);
+  const [composer, setComposer] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +31,7 @@ export function SaveTranscriptionForm({ jobId, defaultName }: SaveTranscriptionF
     setSaved(false);
     setError(null);
     try {
-      await saveTranscription(token, jobId, displayName);
+      await saveTranscription(token, jobId, displayName, composer.trim() || undefined);
       setSaved(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -43,12 +44,24 @@ export function SaveTranscriptionForm({ jobId, defaultName }: SaveTranscriptionF
     <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
       <input
         type="text"
+        aria-label="Title"
+        placeholder="Title"
         value={displayName}
         onChange={(event) => {
           setDisplayName(event.target.value);
           setSaved(false);
         }}
         required
+      />
+      <input
+        type="text"
+        aria-label="Composer"
+        placeholder="Composer (optional)"
+        value={composer}
+        onChange={(event) => {
+          setComposer(event.target.value);
+          setSaved(false);
+        }}
       />
       <button type="submit" disabled={isSaving}>
         {isSaving ? 'Saving...' : 'Save'}

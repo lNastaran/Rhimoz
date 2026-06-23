@@ -25,3 +25,30 @@ export async function apiFetch(
 export function apiUrl(path: string): string {
   return `${API_BASE_URL}${path}`;
 }
+
+export const KIND_TO_EXTENSION = { musicxml: 'musicxml', midi: 'mid', pdf: 'pdf' } as const;
+
+/**
+ * Fetch an authenticated file (saved or public transcription download) and
+ * trigger a browser download via a throwaway object URL. Shared by saved.ts
+ * and public.ts: unlike DownloadButtons' plain <a href> links (which work
+ * because /jobs/.../download is unauthenticated), these endpoints require a
+ * Bearer token a plain navigation can't attach.
+ */
+export async function downloadAuthedFile(
+  token: string,
+  path: string,
+  filename: string,
+): Promise<void> {
+  const response = await apiFetch(path, {}, token);
+  const blob = await response.blob();
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = objectUrl;
+  link.download = filename;
+  link.click();
+  // Revoking immediately after click() can race the browser's download
+  // handoff in some browsers (the blob isn't necessarily read yet) - a
+  // short delay is the standard workaround for this exact gotcha.
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+}

@@ -37,9 +37,10 @@ imports the deprecated `pkg_resources` API.
   concrete implementation so far. Adding piano/guitar/violin/flute later
   means writing a new profile file here, not touching pipeline code.
 - `src/rhimoz/notes/` — the internal note model (`TranscribedNote`,
-  `NoteSequence`), independent of any notation library, with a typed slot
-  (`TabAnnotation`) for the harmonica tab overlay Phase 3 will attach.
+  `NoteSequence`), independent of any notation library. `TabAnnotation`
+  (hole number + blow/draw direction) is attached by
+  `pipeline/tab.py`/`ChromaticHarmonicaProfile.tab_for_note()`.
 - `src/rhimoz/pipeline/` — one module per stage (preprocess, detect,
-  quantize, export to MusicXML/MIDI, export to PDF).
+  quantize, tab annotation, export to MusicXML/MIDI, export to PDF).
 - `src/rhimoz/transcribe.py` — top-level orchestration tying the stages
   together.

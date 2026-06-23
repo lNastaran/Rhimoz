@@ -20,12 +20,10 @@ assets/            logo and other static brand assets
 1. ✅ Core transcription engine (file-based) - preprocessing, pitch
    detection, tempo/beat quantization, MusicXML/MIDI/PDF export
 2. ✅ Web frontend: upload UI, notation rendering, playback, downloads
-3. Harmonica tab overlay (the differentiator): standard notation rendered
-   normally, with a second line underneath each note showing the hole
-   number and a blow/draw arrow (↑ = blow, ↓ = draw), the format used in
-   published harmonica tab books. This isn't built yet, but the engine
-   already produces exactly the note+timing data it will need, with a
-   typed-but-empty slot (`TabAnnotation`) ready to attach it.
+3. ✅ Harmonica tab overlay (the differentiator): standard notation
+   rendered normally, with a second line underneath each note showing
+   the hole number and a blow/draw arrow (↑ = blow, ↓ = draw), the
+   format used in published harmonica tab books.
 4. Live "Shazam-style" mic listening, sharing the Phase 1 engine
 5. Accounts & saved-transcription history
 6. Song search across saved transcriptions + a bundled public-domain set

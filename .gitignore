@@ -7,3 +7,8 @@ node_modules/
 *.egg-info/
 .pytest_cache/
 dist/
+CLAUDE.md
+# Synthesized seed audio is regenerated deterministically from the music21
+# corpus by seed/generate_audio.py, so it isn't committed - the corpus
+# (a dependency) is the real source of record. See backend/seed/PROVENANCE.md.
+backend/seed/audio/

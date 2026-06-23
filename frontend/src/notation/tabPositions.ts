@@ -1,4 +1,4 @@
-import { OpenSheetMusicDisplay, VexFlowGraphicalNote } from 'opensheetmusicdisplay';
+import { Fraction, OpenSheetMusicDisplay, VexFlowGraphicalNote } from 'opensheetmusicdisplay';
 
 export interface NotePosition {
   left: number;
@@ -30,11 +30,17 @@ export function extractNotePositions(
 
   // Walk a CLONE of the cursor's iterator, never the live cursor itself -
   // useCursorSync owns the live cursor's position for playback sync, and
-  // this must not disturb it. cursor.reset() repositions the live cursor
-  // to the start first (harmless: this runs right after rendering, before
-  // playback), so the clone always starts from a known position.
-  osmd.cursor.reset();
-  const iterator = osmd.cursor.iterator.clone();
+  // this must not disturb it. An earlier version called cursor.reset()
+  // before cloning to force a known starting position, but reset()
+  // mutates the LIVE cursor in place - if a resize fires mid-playback,
+  // that snapped the visible cursor back to the start of the piece for
+  // one frame (a real bug, found via manual browser testing, not just
+  // theorized). clone(new Fraction(0)) builds an independent iterator
+  // starting at the beginning without touching the live cursor's
+  // position at all, confirmed via OSMD's own source: its constructor
+  // parameter overrides the clone's start point regardless of where the
+  // source iterator currently stands.
+  const iterator = osmd.cursor.iterator.clone(new Fraction(0));
 
   while (!iterator.EndReached) {
     for (const voiceEntry of iterator.CurrentVoiceEntries) {

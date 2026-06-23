@@ -29,10 +29,30 @@ SUPABASE_PUBLISHABLE_KEY=<anon/publishable key, from Project Settings -> API Key
 SUPABASE_SECRET_KEY=<service_role/secret key, from the same page - keep private>
 ```
 
-Then apply `migrations/0001_saved_transcriptions.sql` via the Supabase
+Then apply the SQL migrations in `migrations/` in order via the Supabase
 dashboard's SQL Editor (or the `supabase` CLI, if you have a project
-linked) - it creates the `saved_transcriptions` table with Row Level
-Security policies enforcing `auth.uid() = user_id` on every operation.
+linked):
+
+- `0001_saved_transcriptions.sql` creates the `saved_transcriptions`
+  table with Row Level Security policies enforcing `auth.uid() = user_id`
+  on every operation.
+- `0002_public_and_composer.sql` adds the optional `composer` column to
+  `saved_transcriptions` and creates the world-readable
+  `public_transcriptions` table for the bundled public-domain set.
+
+### Seeding the public-domain set
+
+After `0002` is applied, populate the bundled "Public-domain library":
+
+```sh
+.venv/bin/python -m seed.seed_public_transcriptions
+```
+
+This regenerates clean audio from public-domain melodies in the music21
+corpus (no network), runs them through the real engine pipeline, and
+upserts the results into `public_transcriptions` using the secret key. It
+is idempotent. See [seed/PROVENANCE.md](seed/PROVENANCE.md) for the tunes
+and their licensing.
 
 ## Run
 
@@ -54,7 +74,16 @@ server at `http://localhost:5173`.
   `Authorization: Bearer <token>`). The download route regenerates
   MIDI/PDF/MusicXML on demand from the saved note data rather than
   storing those binaries - see `engine/src/rhimoz/transcribe.py`'s
-  `render_outputs()`.
+  `render_outputs()`. `POST /saved` accepts an optional `composer`.
+- `GET /public/{id}`, `GET /public/{id}/download/{kind}` - read-only
+  reopen and download for the bundled public-domain set. Same
+  regenerate-on-demand path as saved downloads (shared in
+  `rhimoz_api/render.py`); the table is world-readable, writes happen
+  only via the seed script.
+- `GET /search?q=...` - song search across both the caller's own saved
+  transcriptions (RLS-scoped) and the public set, matching title and
+  composer (case-insensitive substring), returned as separate
+  `personal`/`public` lists.
 
 ## Test
 
@@ -63,10 +92,14 @@ server at `http://localhost:5173`.
 .venv/bin/pytest -v -m "not requires_supabase"  # skip live-Supabase tests
 ```
 
-`tests/test_saved.py` is a genuine integration suite, not a unit test
-with a fake DB: it does real sign-ups against the Supabase project in
-`.env` and exercises real Postgres RLS, since there's no local
-Postgres+PostgREST+RLS emulator in this project to fake that against.
+`tests/test_saved.py`, `tests/test_public.py`, and `tests/test_search.py`
+are a genuine integration suite, not unit tests with a fake DB: they do
+real sign-ups against the Supabase project in `.env` and exercise real
+Postgres RLS (including that `/search` never returns another user's
+private rows), since there's no local Postgres+PostgREST+RLS emulator in
+this project to fake that against. The public-table tests insert a bundled
+row with the secret key (which bypasses the read-only RLS) and clean it up
+afterward.
 Skips automatically (rather than failing) if Supabase env vars aren't
 configured, same as `phase0_sample_path` skips when real sample audio
 isn't present.

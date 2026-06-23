@@ -29,13 +29,17 @@ assets/            logo and other static brand assets
    transcriptions with reopen and delete. Built on Supabase (Postgres +
    auth), with Row Level Security enforcing per-user ownership at the
    database layer.
-5. Song search across saved transcriptions + a bundled public-domain set
-6. (Stretch) Instrument expansion via the profile abstraction - piano,
-   guitar, violin, flute
+5. ✅ Song search across saved transcriptions + a bundled public-domain
+   set: a dedicated search page matching title and composer across both
+   the user's own saved transcriptions and a small set of bundled
+   public-domain songs (traditional Irish airs from O'Neill's Music of
+   Ireland, 1903), each reopenable and downloadable like any other
+   transcription.
 
-Future work: Live "Shazam-style" mic listening, and fetching arbitrary
-copyrighted audio by song title, YouTube ingestion, and training a custom
-pitch-detection model from scratch.
+Future work: instrument expansion via the profile abstraction (piano,
+guitar, violin, flute), live "Shazam-style" mic listening, fetching
+arbitrary copyrighted audio by song title, YouTube ingestion, and training
+a custom pitch-detection model from scratch.
 
 ## Dev setup
 

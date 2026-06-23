@@ -5,7 +5,8 @@ notation with a harmonica tab overlay (hole number + blow/draw arrow
 under each note), rendered via [OpenSheetMusicDisplay](https://opensheetmusicdisplay.org/),
 play the original recording back with the notation cursor tracking
 along, download MusicXML/MIDI/PDF. Sign up/log in to save a
-transcription and reopen it later from a dashboard.
+transcription and reopen it later from a dashboard, and search across
+your saved songs plus a bundled public-domain library.
 
 ## Setup
 
@@ -61,9 +62,12 @@ trying it in an actual browser after any change to these components.
 the only login-gated action). `/login`, `/signup` - auth forms,
 redirect to `/dashboard` if already logged in. `/dashboard` - lists the
 current user's saved transcriptions, with delete; redirects to `/login`
-if logged out. `/saved/:id` - reopens one saved transcription (notation
-+ fresh downloads only, no audio playback - original audio isn't
-persisted, see the Phase 5 plan's "File storage fork" section).
+if logged out. `/search` - search by title or composer across the user's
+saved transcriptions and the bundled public-domain library, shown as two
+sections. `/saved/:id` - reopens one saved transcription; `/public/:id` -
+reopens a bundled public-domain song (both notation + fresh downloads
+only, no audio playback - original audio isn't persisted, see the Phase 5
+plan's "File storage fork" section).
 
 ## Known limitations
 

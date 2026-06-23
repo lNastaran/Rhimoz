@@ -53,11 +53,13 @@ class TranscribeResponse(BaseModel):
 class SaveTranscriptionRequest(BaseModel):
     job_id: str
     display_name: str
+    composer: str | None = None
 
 
 class SavedTranscriptionOut(BaseModel):
     id: str
     display_name: str
+    composer: str | None = None
     instrument_name: str
     tempo_bpm: float | None
     created_at: str
@@ -66,3 +68,32 @@ class SavedTranscriptionOut(BaseModel):
 class SavedTranscriptionDetailOut(SavedTranscriptionOut):
     musicxml: str
     notes: list[TranscribedNoteOut]
+
+
+class PublicTranscriptionOut(BaseModel):
+    """A row from the bundled public-domain set. Mirrors
+    SavedTranscriptionOut (title plays the role of display_name) plus
+    provenance, and has no owner."""
+
+    id: str
+    title: str
+    composer: str | None = None
+    instrument_name: str
+    tempo_bpm: float | None
+    source_url: str | None = None
+    license: str | None = None
+    created_at: str
+
+
+class PublicTranscriptionDetailOut(PublicTranscriptionOut):
+    musicxml: str
+    notes: list[TranscribedNoteOut]
+
+
+class SearchResultsOut(BaseModel):
+    """Search hits split by source so the UI can render the user's own
+    saved transcriptions and the bundled public-domain library as
+    separate sections."""
+
+    personal: list[SavedTranscriptionOut]
+    public: list[PublicTranscriptionOut]

@@ -28,12 +28,10 @@ assets/            logo and other static brand assets
 5. Song search across saved transcriptions + a bundled public-domain set
 6. (Stretch) Instrument expansion via the profile abstraction - piano,
    guitar, violin, flute
-7. Live "Shazam-style" mic listening, sharing the Phase 1 engine -
-   deferred for now in favor of the items above, picked up later
 
-Explicitly out of scope: fetching arbitrary copyrighted audio by song
-title (a licensing problem, not an engineering one), YouTube ingestion,
-and training a custom pitch-detection model from scratch.
+Future work: Live "Shazam-style" mic listening, and fetching arbitrary
+copyrighted audio by song title, YouTube ingestion, and training a custom
+pitch-detection model from scratch.
 
 ## Dev setup
 

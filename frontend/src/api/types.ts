@@ -1,10 +1,16 @@
 // Mirrors backend/src/rhimoz_api/schemas.py
 
+export interface TabAnnotationOut {
+  label: string;
+  direction: string;
+}
+
 export interface TranscribedNoteOut {
   start_s: number;
   end_s: number;
   midi_pitch: number;
   amplitude: number;
+  tab: TabAnnotationOut | null;
 }
 
 export interface TranscribeResponse {

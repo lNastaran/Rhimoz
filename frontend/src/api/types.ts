@@ -25,3 +25,16 @@ export interface TranscribeResponse {
     pdf: string;
   };
 }
+
+export interface SavedTranscriptionOut {
+  id: string;
+  display_name: string;
+  instrument_name: string;
+  tempo_bpm: number | null;
+  created_at: string;
+}
+
+export interface SavedTranscriptionDetailOut extends SavedTranscriptionOut {
+  musicxml: string;
+  notes: TranscribedNoteOut[];
+}

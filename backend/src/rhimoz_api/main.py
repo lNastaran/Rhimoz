@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from rhimoz_api.routes import downloads, saved, transcribe
+from rhimoz_api.routes import downloads, public, saved, search, transcribe
 
 app = FastAPI(title="Rhimoz API")
 
@@ -17,3 +17,5 @@ app.add_middleware(
 app.include_router(transcribe.router)
 app.include_router(downloads.router)
 app.include_router(saved.router)
+app.include_router(public.router)
+app.include_router(search.router)

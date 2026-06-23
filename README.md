@@ -24,11 +24,12 @@ assets/            logo and other static brand assets
    rendered normally, with a second line underneath each note showing
    the hole number and a blow/draw arrow (↑ = blow, ↓ = draw), the
    format used in published harmonica tab books.
-4. Live "Shazam-style" mic listening, sharing the Phase 1 engine
-5. Accounts & saved-transcription history
-6. Song search across saved transcriptions + a bundled public-domain set
-7. (Stretch) Instrument expansion via the profile abstraction - piano,
+4. Accounts & saved-transcription history
+5. Song search across saved transcriptions + a bundled public-domain set
+6. (Stretch) Instrument expansion via the profile abstraction - piano,
    guitar, violin, flute
+7. Live "Shazam-style" mic listening, sharing the Phase 1 engine -
+   deferred for now in favor of the items above, picked up later
 
 Explicitly out of scope: fetching arbitrary copyrighted audio by song
 title (a licensing problem, not an engineering one), YouTube ingestion,

@@ -38,7 +38,7 @@ function App() {
       <UploadForm onSubmit={handleUpload} />
       {response && audioUrl && (
         <>
-          <NotationViewer musicxml={response.musicxml} osmdRef={osmdRef} />
+          <NotationViewer musicxml={response.musicxml} notes={response.notes} osmdRef={osmdRef} />
           <AudioPlayer src={audioUrl} audioRef={audioRef} />
           <DownloadButtons downloadUrls={response.download_urls} />
         </>

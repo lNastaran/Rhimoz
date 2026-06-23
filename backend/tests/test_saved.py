@@ -40,18 +40,22 @@ async def test_save_list_get_delete_round_trip(authenticated_client, phase0_samp
     job_id = transcribe_resp.json()["job_id"]
 
     save_resp = await authenticated_client.post(
-        "/saved", json={"job_id": job_id, "display_name": "Round trip test"}
+        "/saved",
+        json={"job_id": job_id, "display_name": "Round trip test", "composer": "J. S. Test"},
     )
     assert save_resp.status_code == 200
     saved_id = save_resp.json()["id"]
+    assert save_resp.json()["composer"] == "J. S. Test"
 
     list_resp = await authenticated_client.get("/saved")
     assert list_resp.status_code == 200
-    assert any(row["id"] == saved_id for row in list_resp.json())
+    listed = next(row for row in list_resp.json() if row["id"] == saved_id)
+    assert listed["composer"] == "J. S. Test"
 
     detail_resp = await authenticated_client.get(f"/saved/{saved_id}")
     assert detail_resp.status_code == 200
     body = detail_resp.json()
+    assert body["composer"] == "J. S. Test"
     assert body["musicxml"]
     assert len(body["notes"]) > 0
 

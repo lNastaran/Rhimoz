@@ -72,6 +72,45 @@ async def _delete_test_user(user_id: str) -> None:
     await admin_client.auth.admin.delete_user(user_id)
 
 
+async def _secret_client():
+    """A client authed with the SECRET (service-role) key, which bypasses
+    RLS. The public_transcriptions table has only a read policy, so tests
+    that need to insert/remove a bundled row must go through this."""
+    from supabase import AsyncClientOptions, create_async_client
+
+    return await create_async_client(
+        os.environ["SUPABASE_URL"],
+        os.environ["SUPABASE_SECRET_KEY"],
+        AsyncClientOptions(auto_refresh_token=False),
+    )
+
+
+async def insert_public_transcription(**overrides) -> str:
+    """Insert a bundled public-domain row and return its id. Caller must
+    delete_public_transcription() it afterward."""
+    db = await _secret_client()
+    row = {
+        "title": "Test Public Tune",
+        "composer": "Traditional (Test)",
+        "instrument_name": "chromatic_harmonica",
+        "tempo_bpm": 120.0,
+        "musicxml": "<score-partwise/>",
+        "notes_json": [
+            {"start_s": 0.0, "end_s": 0.5, "midi_pitch": 60, "amplitude": 0.9, "tab": None}
+        ],
+        "source_url": "test",
+        "license": "Public Domain",
+        **overrides,
+    }
+    result = await db.table("public_transcriptions").insert(row).select("id").execute()
+    return result.data[0]["id"]
+
+
+async def delete_public_transcription(public_id: str) -> None:
+    db = await _secret_client()
+    await db.table("public_transcriptions").delete().eq("id", public_id).execute()
+
+
 @pytest.fixture
 async def authenticated_client():
     """A real sign-up per test, not faked via dependency_overrides -

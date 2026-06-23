@@ -41,3 +41,9 @@ def test_transcribe_file_end_to_end(phase0_sample_path, tmp_path):
     assert all(notes[i + 1].start_s >= notes[i].end_s for i in range(len(notes) - 1))
 
     assert result.note_sequence.tempo_bpm is not None
+
+    # any, not all: a real detected pitch landing right at a range
+    # boundary could legitimately have no tab (see tab_for_note()'s
+    # defensive None-outside-range handling), so this checks tab
+    # annotation actually ran, not that every note got one.
+    assert any(n.tab is not None for n in notes)

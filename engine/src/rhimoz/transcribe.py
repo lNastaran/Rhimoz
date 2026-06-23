@@ -14,6 +14,7 @@ from rhimoz.pipeline.export_musicxml import export_midi, export_musicxml
 from rhimoz.pipeline.export_pdf import export_pdf
 from rhimoz.pipeline.preprocess import load_audio, normalize_audio
 from rhimoz.pipeline.quantize import estimate_tempo, quantize_to_grid
+from rhimoz.pipeline.tab import annotate_tabs
 
 
 @dataclass
@@ -28,8 +29,8 @@ def transcribe_file(
     audio_path: str | Path, profile: InstrumentProfile, out_dir: str | Path
 ) -> TranscriptionResult:
     """Runs the full file-based pipeline: preprocess -> detect -> quantize
-    -> export. Output files are named after the input audio's stem and
-    written into out_dir (created if missing)."""
+    -> annotate tabs -> export. Output files are named after the input
+    audio's stem and written into out_dir (created if missing)."""
     audio_path = Path(audio_path)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -52,14 +53,15 @@ def transcribe_file(
 
     tempo = estimate_tempo(y, sr)
     quantized = quantize_to_grid(raw_sequence, tempo)
+    tabbed = annotate_tabs(quantized, profile)
 
     stem = audio_path.stem
-    musicxml_path = export_musicxml(quantized, out_dir / f"{stem}.musicxml")
-    midi_path = export_midi(quantized, out_dir / f"{stem}.mid")
-    pdf_path = export_pdf(quantized, out_dir / f"{stem}.pdf")
+    musicxml_path = export_musicxml(tabbed, out_dir / f"{stem}.musicxml")
+    midi_path = export_midi(tabbed, out_dir / f"{stem}.mid")
+    pdf_path = export_pdf(tabbed, out_dir / f"{stem}.pdf")
 
     return TranscriptionResult(
-        note_sequence=quantized,
+        note_sequence=tabbed,
         musicxml_path=musicxml_path,
         midi_path=midi_path,
         pdf_path=pdf_path,

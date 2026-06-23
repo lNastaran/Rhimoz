@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from dotenv import load_dotenv
 from fastapi import Header, HTTPException
-from supabase import AsyncClient, AuthError, create_async_client
+from supabase import AsyncClient, AsyncClientOptions, AuthError, create_async_client
 
 load_dotenv()
 
@@ -23,10 +23,25 @@ async def get_supabase_client() -> AsyncClient:
     return _client
 
 
+async def get_user_scoped_client(token: str) -> AsyncClient:
+    """A fresh client per call, not the shared singleton from
+    get_supabase_client() - postgrest's auth header lives as mutable state
+    on the client instance (client.postgrest.auth(token) sets it in
+    place), so reusing one shared client across concurrent requests for
+    different users would race: request A's query could run with request
+    B's token if their awaits interleave. Verified against the real
+    project that passing the token via ClientOptions at construction time
+    (rather than auth()-ing a shared client afterward) correctly scopes
+    Postgres RLS to that user."""
+    options = AsyncClientOptions(headers={"Authorization": f"Bearer {token}"})
+    return await create_async_client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, options)
+
+
 @dataclass
 class User:
     id: str
     email: str | None
+    token: str
 
 
 async def get_current_user(authorization: str | None = Header(default=None)) -> User:
@@ -52,4 +67,4 @@ async def get_current_user(authorization: str | None = Header(default=None)) -> 
     # source after `.claims` attribute access raised AttributeError
     # against a real token in manual testing).
     claims = response["claims"]
-    return User(id=claims["sub"], email=claims.get("email"))
+    return User(id=claims["sub"], email=claims.get("email"), token=token)

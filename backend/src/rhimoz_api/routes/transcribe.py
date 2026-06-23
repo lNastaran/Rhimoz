@@ -7,7 +7,7 @@ from rhimoz.instruments import PROFILES
 from rhimoz.transcribe import transcribe_file
 
 from rhimoz_api.jobs import JOBS, JOBS_ROOT, JobRecord
-from rhimoz_api.schemas import TabAnnotationOut, TranscribeResponse, TranscribedNoteOut
+from rhimoz_api.schemas import TranscribeResponse, notes_to_out
 
 router = APIRouter()
 
@@ -89,18 +89,7 @@ async def transcribe(
         job_id=job_id,
         instrument_name=result.note_sequence.instrument_name,
         tempo_bpm=result.note_sequence.tempo_bpm,
-        notes=[
-            TranscribedNoteOut(
-                start_s=n.start_s,
-                end_s=n.end_s,
-                midi_pitch=n.midi_pitch,
-                amplitude=n.amplitude,
-                tab=TabAnnotationOut(label=n.tab.label, direction=n.tab.direction)
-                if n.tab
-                else None,
-            )
-            for n in result.note_sequence.notes
-        ],
+        notes=notes_to_out(result.note_sequence.notes),
         musicxml=result.musicxml_path.read_text(),
         download_urls={
             "musicxml": f"/jobs/{job_id}/download/musicxml",

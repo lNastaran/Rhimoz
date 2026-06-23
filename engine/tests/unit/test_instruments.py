@@ -1,6 +1,7 @@
 import librosa
 
 from rhimoz.instruments import PROFILES, ChromaticHarmonicaProfile
+from rhimoz.notes.model import TabAnnotation
 
 
 def test_registry_contains_chromatic_harmonica():
@@ -28,9 +29,52 @@ def test_is_monophonic():
     assert ChromaticHarmonicaProfile.is_monophonic is True
 
 
-def test_default_tab_for_note_is_none_for_any_profile():
+def test_tab_for_note_hole_1_blow_at_bottom_of_range():
     profile = ChromaticHarmonicaProfile()
-    assert profile.tab_for_note(60) is None
+    assert profile.tab_for_note(48) == TabAnnotation(label="1", direction="blow")  # C3
+
+
+def test_tab_for_note_hole_1_draw():
+    profile = ChromaticHarmonicaProfile()
+    assert profile.tab_for_note(50) == TabAnnotation(label="1", direction="draw")  # D3
+
+
+def test_tab_for_note_uses_slide_internally_but_does_not_expose_it():
+    profile = ChromaticHarmonicaProfile()
+    # C#3 needs the slide button pressed, but the label/direction are
+    # identical to the non-slide C3 - the slide bit never leaks out.
+    assert profile.tab_for_note(49) == TabAnnotation(label="1", direction="blow")
+
+
+def test_tab_for_note_second_octave_starts_at_hole_5():
+    profile = ChromaticHarmonicaProfile()
+    assert profile.tab_for_note(60) == TabAnnotation(label="5", direction="blow")  # C4
+
+
+def test_tab_for_note_matches_well_known_g_on_holes_3_and_7():
+    profile = ChromaticHarmonicaProfile()
+    assert profile.tab_for_note(55) == TabAnnotation(label="3", direction="blow")  # G3
+    assert profile.tab_for_note(67) == TabAnnotation(label="7", direction="blow")  # G4
+
+
+def test_tab_for_note_top_of_range_clamps_to_last_hole():
+    profile = ChromaticHarmonicaProfile()
+    assert profile.tab_for_note(96) == TabAnnotation(label="16", direction="blow")  # C7
+
+
+def test_tab_for_note_just_below_top_uses_hole_16_draw():
+    profile = ChromaticHarmonicaProfile()
+    assert profile.tab_for_note(95) == TabAnnotation(label="16", direction="draw")  # B6
+
+
+def test_tab_for_note_returns_none_above_max_midi():
+    profile = ChromaticHarmonicaProfile()
+    assert profile.tab_for_note(97) is None
+
+
+def test_tab_for_note_returns_none_below_min_midi():
+    profile = ChromaticHarmonicaProfile()
+    assert profile.tab_for_note(47) is None
 
 
 def test_resolve_overlaps_keeps_non_overlapping_notes():

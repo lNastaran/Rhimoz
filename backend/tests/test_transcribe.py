@@ -17,6 +17,9 @@ async def test_transcribe_endpoint_returns_expected_shape(client, phase0_sample_
     assert "start_s" in body["notes"][0]
     assert "<score-partwise" in body["musicxml"]
     assert set(body["download_urls"]) == {"musicxml", "midi", "pdf"}
+    # any, not all: a detected pitch right at a range boundary could
+    # legitimately have no tab annotation.
+    assert any(n["tab"] is not None for n in body["notes"])
 
 
 async def test_transcribe_rejects_unknown_instrument(client, phase0_sample_path):

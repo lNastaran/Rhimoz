@@ -1,11 +1,17 @@
 from pydantic import BaseModel
 
 
+class TabAnnotationOut(BaseModel):
+    label: str
+    direction: str
+
+
 class TranscribedNoteOut(BaseModel):
     start_s: float
     end_s: float
     midi_pitch: int
     amplitude: float
+    tab: TabAnnotationOut | None = None
 
 
 class TranscribeResponse(BaseModel):

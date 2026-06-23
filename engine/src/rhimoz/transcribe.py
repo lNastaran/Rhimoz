@@ -25,6 +25,31 @@ class TranscriptionResult:
     pdf_path: Path
 
 
+def render_outputs(
+    note_sequence: NoteSequence, out_dir: str | Path, stem: str = "transcription"
+) -> TranscriptionResult:
+    """Exports an already-known NoteSequence to MusicXML/MIDI/PDF, skipping
+    pitch detection entirely. Used by transcribe_file() below (after
+    detecting from raw audio) and by the backend's reopen-a-saved-
+    transcription flow, where the notes were already detected once and
+    stored - re-running Basic Pitch on the original audio again would be
+    pure waste, since MIDI/PDF are both fully derived from the same note
+    sequence MusicXML is derived from, not independent sources."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    musicxml_path = export_musicxml(note_sequence, out_dir / f"{stem}.musicxml")
+    midi_path = export_midi(note_sequence, out_dir / f"{stem}.mid")
+    pdf_path = export_pdf(note_sequence, out_dir / f"{stem}.pdf")
+
+    return TranscriptionResult(
+        note_sequence=note_sequence,
+        musicxml_path=musicxml_path,
+        midi_path=midi_path,
+        pdf_path=pdf_path,
+    )
+
+
 def transcribe_file(
     audio_path: str | Path, profile: InstrumentProfile, out_dir: str | Path
 ) -> TranscriptionResult:
@@ -32,8 +57,6 @@ def transcribe_file(
     -> annotate tabs -> export. Output files are named after the input
     audio's stem and written into out_dir (created if missing)."""
     audio_path = Path(audio_path)
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
 
     y, sr = load_audio(audio_path)
     y = normalize_audio(y)
@@ -55,14 +78,4 @@ def transcribe_file(
     quantized = quantize_to_grid(raw_sequence, tempo)
     tabbed = annotate_tabs(quantized, profile)
 
-    stem = audio_path.stem
-    musicxml_path = export_musicxml(tabbed, out_dir / f"{stem}.musicxml")
-    midi_path = export_midi(tabbed, out_dir / f"{stem}.mid")
-    pdf_path = export_pdf(tabbed, out_dir / f"{stem}.pdf")
-
-    return TranscriptionResult(
-        note_sequence=tabbed,
-        musicxml_path=musicxml_path,
-        midi_path=midi_path,
-        pdf_path=pdf_path,
-    )
+    return render_outputs(tabbed, out_dir, stem=audio_path.stem)

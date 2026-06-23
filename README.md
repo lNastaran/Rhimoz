@@ -24,7 +24,11 @@ assets/            logo and other static brand assets
    rendered normally, with a second line underneath each note showing
    the hole number and a blow/draw arrow (↑ = blow, ↓ = draw), the
    format used in published harmonica tab books.
-4. Accounts & saved-transcription history
+4. ✅ Accounts & saved-transcription history: email/password auth, a
+   "Save" action on any transcription, a dashboard listing saved
+   transcriptions with reopen and delete. Built on Supabase (Postgres +
+   auth), with Row Level Security enforcing per-user ownership at the
+   database layer.
 5. Song search across saved transcriptions + a bundled public-domain set
 6. (Stretch) Instrument expansion via the profile abstraction - piano,
    guitar, violin, flute

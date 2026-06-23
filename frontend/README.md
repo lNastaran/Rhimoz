@@ -4,12 +4,21 @@ React + TypeScript + Vite web UI: upload audio, see it as standard
 notation with a harmonica tab overlay (hole number + blow/draw arrow
 under each note), rendered via [OpenSheetMusicDisplay](https://opensheetmusicdisplay.org/),
 play the original recording back with the notation cursor tracking
-along, download MusicXML/MIDI/PDF.
+along, download MusicXML/MIDI/PDF. Sign up/log in to save a
+transcription and reopen it later from a dashboard.
 
 ## Setup
 
 ```sh
 npm install
+```
+
+Accounts (Phase 5) need the same Supabase project the backend uses. Add
+a `.env.local` file (gitignored via the existing `*.local` pattern) with:
+
+```
+VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
+VITE_SUPABASE_ANON_KEY=<the same anon/publishable key backend/.env uses>
 ```
 
 ## Run
@@ -46,7 +55,17 @@ a mocked render would never have reproduced it. Verify the full upload
 -> render -> playback -> download flow by running both servers and
 trying it in an actual browser after any change to these components.
 
+## Pages
+
+`/` - the upload-and-transcribe flow (works with no login - saving is
+the only login-gated action). `/login`, `/signup` - auth forms,
+redirect to `/dashboard` if already logged in. `/dashboard` - lists the
+current user's saved transcriptions, with delete; redirects to `/login`
+if logged out. `/saved/:id` - reopens one saved transcription (notation
++ fresh downloads only, no audio playback - original audio isn't
+persisted, see the Phase 5 plan's "File storage fork" section).
+
 ## Known limitations
 
-- No accounts/persistence (Phase 5) - nothing is saved between sessions.
-- No automated UI tests, per the testing note above.
+- No automated UI tests, per the testing note above - this now also
+  covers the auth/dashboard/reopen flows, verified manually the same way.

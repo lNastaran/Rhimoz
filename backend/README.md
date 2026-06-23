@@ -101,3 +101,12 @@ per Phase 0's findings); revisit if concurrent load ever matters.
   reach the server can transcribe and download without an account. Only
   *saving* a transcription requires login (a deliberate "try free, sign
   in to save" choice, not an oversight - see the Phase 5 plan).
+- `job_id` is a bearer-capability, not an owned resource: `POST /saved`
+  doesn't check that the job belongs to the requesting user's own
+  session, so anyone who obtains a `job_id` (random UUID, not
+  enumerable) can save a copy of that transcription to their own
+  account - the same exposure `/jobs/{id}/download/{kind}` already has
+  for downloading, just extended to a new action rather than a new gap.
+  Acceptable for now under the same bound (UUIDs aren't guessable);
+  would need real per-job ownership if `/transcribe` ever stops being
+  open to anyone.

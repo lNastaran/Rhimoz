@@ -30,4 +30,5 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 markers = [
     "integration: loads Basic Pitch and needs real audio (deselect with -m \"not integration\")",
+    "requires_supabase: needs a live Supabase project over the network (deselect with -m \"not requires_supabase\")",
 ]

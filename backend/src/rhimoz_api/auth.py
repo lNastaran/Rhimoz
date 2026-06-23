@@ -32,8 +32,14 @@ async def get_user_scoped_client(token: str) -> AsyncClient:
     B's token if their awaits interleave. Verified against the real
     project that passing the token via ClientOptions at construction time
     (rather than auth()-ing a shared client afterward) correctly scopes
-    Postgres RLS to that user."""
-    options = AsyncClientOptions(headers={"Authorization": f"Bearer {token}"})
+    Postgres RLS to that user. auto_refresh_token=False since this client
+    is discarded at the end of the request - without it, each one leaves
+    a background refresh-timer task running with nothing left to cancel
+    it (observed as "Task was destroyed but it is pending" warnings in
+    test teardown - a real leaked-task issue, not just test noise)."""
+    options = AsyncClientOptions(
+        headers={"Authorization": f"Bearer {token}"}, auto_refresh_token=False
+    )
     return await create_async_client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, options)
 
 

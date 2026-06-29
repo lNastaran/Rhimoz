@@ -59,7 +59,13 @@ trying it in an actual browser after any change to these components.
 ## Pages
 
 `/` - the upload-and-transcribe flow (works with no login - saving is
-the only login-gated action). `/login`, `/signup` - auth forms,
+the only login-gated action). You can also **record from the microphone**
+instead of uploading a file: it records (MediaRecorder), decodes the clip
+to PCM in the browser, re-encodes it to WAV (the backend can't decode
+webm/opus without ffmpeg, but WAV is fine), and sends it through the exact
+same transcribe path. Mic capture needs a secure context, so it works on
+localhost but not over plain HTTP on another device (that would need
+HTTPS). `/login`, `/signup` - auth forms,
 redirect to `/dashboard` if already logged in. `/dashboard` - lists the
 current user's saved transcriptions, with delete; redirects to `/login`
 if logged out. `/search` - search by title or composer across the user's

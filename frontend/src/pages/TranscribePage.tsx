@@ -3,6 +3,7 @@ import type { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
 import { postTranscribe } from '../api/transcribe';
 import type { TranscribeResponse } from '../api/types';
 import { UploadForm } from '../components/UploadForm';
+import { MicRecorder } from '../components/MicRecorder';
 import { NotationViewer } from '../components/NotationViewer';
 import { AudioPlayer } from '../components/AudioPlayer';
 import { DownloadButtons } from '../components/DownloadButtons';
@@ -38,6 +39,8 @@ export function TranscribePage() {
   return (
     <>
       <UploadForm onSubmit={handleUpload} />
+      <p>or record from your microphone:</p>
+      <MicRecorder onRecorded={handleUpload} />
       {response && audioUrl && (
         <>
           <NotationViewer musicxml={response.musicxml} notes={response.notes} osmdRef={osmdRef} />
